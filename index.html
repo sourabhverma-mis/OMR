@@ -1,0 +1,73 @@
+<script>
+const API_URL = "https://script.google.com/macros/s/AKfycbzT4nFskRmYpReAoGrlnLgwy1Z1YKRWpCr7dAQdvqBZnSE-apJGbkYbGDADlX79N5yjSA/exec";
+let answers={}, time=1800, freeze=false;
+
+fetch(API_URL+"?action=branches").then(r=>r.json()).then(b=>{
+  branch.innerHTML='<option></option>'+b.map(x=>`<option>${x}</option>`).join("");
+});
+
+setInterval(()=>{
+  if(freeze) return;
+  let m=Math.floor(time/60),s=time%60;
+  timer.innerText=`${m}:${s<10?'0'+s:s}`;
+  time--;
+  if(time<0) submitOMR();
+},1000);
+
+function loadTest(){
+  fetch(API_URL+`?action=testCodes&course=${course.value}`)
+  .then(r=>r.json())
+  .then(d=>testCode.innerHTML='<option></option>'+d.map(x=>`<option>${x}</option>`).join(""));
+}
+
+function loadQuestions(){
+  answers={}; questions.innerHTML="";
+  fetch(API_URL+`?action=meta&testCode=${testCode.value}&course=${course.value}`)
+  .then(r=>r.json())
+  .then(m=>{
+    const opts = ["A","B","C","D","E"].slice(0, m.options);
+    for(let i=1;i<=m.totalQ;i++){
+      questions.innerHTML += `<div class="qrow"><div class="qno">Q${i}</div>${
+        opts.map(o=>`<div class="bubble" onclick="mark(${i},'${o}',this)">${o}</div>`).join("")
+      }</div>`;
+    }
+  });
+}
+
+function mark(q,o,e){
+  answers[q]=o;
+  e.parentElement.querySelectorAll(".bubble").forEach(b=>b.classList.remove("active"));
+  e.classList.add("active");
+}
+
+function submitOMR(){
+  freeze=true;
+  fetch(API_URL,{
+    method:"POST",
+    body:JSON.stringify({
+      branch:branch.value,
+      name:name.value,
+      mobile:mobile.value,
+      course:course.value,
+      testCode:testCode.value,
+      answers
+    })
+  })
+  .then(r=>r.json())
+  .then(res=>{
+    if(res.status==="DUPLICATE"){
+      alert("Already submitted");
+      return;
+    }
+    rName.innerText=res.name;
+    rCorrect.innerText=res.correctMarks;
+    rNegative.innerText=res.negativeMarks;
+    rTotal.innerText=res.totalMarks;
+    rCQ.innerText=res.correctQ;
+    rIQ.innerText=res.incorrectQ;
+    rAtt.innerText=res.attempted;
+    rUnatt.innerText=res.unattempted;
+    popup.style.display="flex";
+  });
+}
+</script>
