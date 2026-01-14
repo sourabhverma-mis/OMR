@@ -209,18 +209,21 @@ function submitOMR(){
   if(freezed) return;
   freezeAll();
 
-  fetch(API,{
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({
-      branch:branch.value,
-      name:name.value,
-      mobile:mobile.value,
-      course:course.value,
-      testCode:testCode.value,
-      answers:answers
-    })
+ fetch(API,{
+  method:"POST",
+  headers:{
+    "Content-Type":"text/plain;charset=utf-8"
+  },
+  body:JSON.stringify({
+    branch:branch.value,
+    name:name.value,
+    mobile:mobile.value,
+    course:course.value,
+    testCode:testCode.value,
+    answers:answers
   })
+})
+
   .then(r=>r.json())
   .then(res=>{
     if(res.status==="DUPLICATE"){
