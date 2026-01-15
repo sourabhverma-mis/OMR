@@ -84,7 +84,7 @@ button:disabled{background:#a5b4fc}
 <select id="branch"></select>
 
 <label>Name</label>
-<input id="name">
+<input id="studentName">
 
 <label>Mobile</label>
 <input id="mobile">
@@ -104,7 +104,7 @@ button:disabled{background:#a5b4fc}
 
 <!-- TIMER -->
 <div class="card">
-⏱ Time Left: <b id="timer">30:00</b>
+⏱ Time Left: <b id="timer">61:00</b>
 </div>
 
 <!-- QUESTIONS -->
@@ -215,15 +215,14 @@ function submitOMR(){
     "Content-Type":"text/plain;charset=utf-8"
   },
   body:JSON.stringify({
-    branch:branch.value,
-    name:name.value,
-    mobile:mobile.value,
-    course:course.value,
-    testCode:testCode.value,
-    answers:answers
+    branch: branch.value,
+    name: document.getElementById("studentName").value.trim(),
+    mobile: mobile.value.trim(),
+    course: course.value,
+    testCode: testCode.value,
+    answers: answers
   })
 })
-
   .then(r=>r.json())
   .then(res=>{
     if(res.status==="DUPLICATE"){
